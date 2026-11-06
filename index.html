@@ -75,6 +75,7 @@
     .at-a-glance{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:17px 0}.glance-item{padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fffaf8}.glance-item span{display:block;color:var(--muted);font-size:10px;letter-spacing:.75px;font-weight:850;text-transform:uppercase}.glance-item b{display:block;margin-top:4px;color:var(--ink);font-size:13px;line-height:1.3}.profile-value .sponsor-label{display:block;margin-bottom:4px;color:var(--red);font-size:10px;letter-spacing:.75px;text-transform:uppercase;font-weight:900}.pilot-plan{margin:20px 0 0;padding:23px;border:1px solid #d8eae3;border-radius:13px;background:#f4faf7}.pilot-plan h3{margin:5px 0 6px;font-size:24px;letter-spacing:-.7px}.pilot-plan>p{margin:0;color:#53655f;font-size:13px;line-height:1.5}.pilot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:17px}.pilot-card{padding:14px;border-radius:9px;background:#fff;border:1px solid #d8eae3}.pilot-card b{display:block;color:#176a56;font-size:18px;letter-spacing:-.5px}.pilot-card span{display:block;margin-top:4px;color:#53655f;font-size:11px;line-height:1.35}.pilot-measures{margin:14px 0 0;padding:13px;border-radius:9px;background:#e7f4ee;color:#176a56;font-size:12px;line-height:1.5}.pilot-measures b{display:block;margin-bottom:3px}@media(max-width:760px){.at-a-glance,.pilot-grid{grid-template-columns:1fr}.glance-item{padding:10px 12px}}
     #profileView .stat-grid{display:none}
     #profileView #profileMeta{display:none}
+    .recommendation-label{margin:4px 0 4px;color:var(--red);font-size:10px;letter-spacing:1.1px;font-weight:900;text-transform:uppercase}.match #matchAthlete{display:block;font-size:29px;line-height:1.06;letter-spacing:-1.1px;color:var(--ink)}.match #campaignName{margin:7px 0 8px;font-size:16px;letter-spacing:-.3px;color:#59615e}.campaign-tier-note{margin:9px 0 0;color:var(--muted);font-size:11px;line-height:1.4}
   </style>
 </head>
 <body>
@@ -356,6 +357,50 @@
       if(value)value.innerHTML='<span class="sponsor-label">Partnership value</span>'+a.value+'<br><small>Illustrative fit only; athlete approval is required for every partnership.</small>';
     };
     document.querySelector('#nilPortalView .nil-impact').insertAdjacentHTML('afterend','<section class="pilot-plan"><div class="eyebrow">Practical launch plan</div><h3>Prove the model with a focused local pilot.</h3><p>Start small, measure the sponsor value, and scale only when renewal behavior shows the model is working.</p><div class="pilot-grid"><div class="pilot-card"><b>10</b><span>local sponsor campaigns in Phase 1</span></div><div class="pilot-card"><b>$1,500</b><span>illustrative average campaign investment</span></div><div class="pilot-card"><b>$15,000</b><span>illustrative sponsor revenue activated</span></div></div><div class="pilot-measures"><b>Pilot success measures</b>QR scans · offer redemptions · sponsor satisfaction · athlete approval and participation · sponsor renewal rate. Renew the strongest campaigns, then expand the program.</div></section>');
+    /* Tier-aware sponsor intake: small campaigns stay digital, while meet-day activation begins at the Signature tier. */
+    var sponsorBudget=document.getElementById('budget'),sponsorCategory=document.getElementById('sponsorType'),campaignSelects=document.querySelectorAll('#campaignView .form-grid select'),campaignStyle=campaignSelects[4];
+    campaignStyle.id='campaignStyle';
+    sponsorBudget.options[0].text='$500 — Community Micro-Campaign';
+    sponsorBudget.options[1].text='$1,500 — Digital Growth Campaign';
+    sponsorBudget.options[2].text='$3,000 — Signature Meet-Day Activation';
+    var directBudget=document.getElementById('directBudget');
+    directBudget.options[0].text='$500 — Community Micro-Campaign';
+    directBudget.options[1].text='$1,500 — Digital Growth Campaign';
+    directBudget.options[2].text='$3,000 — Signature Meet-Day Activation';
+    sponsorCategory.closest('.field').insertAdjacentHTML('afterend','<div id="businessTypeField" class="field custom-price"><label>Business type</label><input id="businessType" placeholder="e.g., Local coffee shop or fitness studio"><small class="campaign-tier-note">Tell us what your business offers so the recommendation can reflect your audience and goals.</small></div>');
+    sponsorBudget.closest('.field').insertAdjacentHTML('beforeend','<p id="campaignTierNote" class="campaign-tier-note"></p>');
+    window.updateCampaignIntake=function(){
+      var budget=Number(sponsorBudget.value),isCustom=sponsorBudget.value==='custom',isOther=sponsorCategory.value==='Other local business';
+      document.getElementById('customPriceField').classList.toggle('show',isCustom);
+      document.getElementById('businessTypeField').classList.toggle('show',isOther);
+      var options=budget===500?['Instagram Story + QR offer','Community thank-you campaign']:budget===3000?['Signature meet-day activation','Premium social content package','Youth-community event']:['Short-form video + Stories + QR','Digital growth campaign','Meet-day promotion'];
+      campaignStyle.innerHTML=options.map(function(option){return '<option>'+option+'</option>'}).join('');
+      document.getElementById('campaignTierNote').textContent=budget===500?'Community Micro-Campaigns are digital only; meet-day activation is available at the $3,000 Signature tier.':budget===3000?'Signature tier includes a meet-day activation, expanded content, results reporting, and a renewal plan.':isCustom?'Custom packages are shaped around the business goal, athlete availability, and approved deliverables.':'Digital Growth Campaigns combine athlete-led content, a trackable QR offer, and results reporting.';
+    };
+    window.toggleCustomBudget=window.updateCampaignIntake;
+    sponsorBudget.addEventListener('change',window.updateCampaignIntake);
+    sponsorCategory.addEventListener('change',window.updateCampaignIntake);
+    window.updateCampaignIntake();
+    var athleteRecommendation=document.getElementById('matchAthlete'),campaignName=document.getElementById('campaignName');
+    athleteRecommendation.parentNode.insertBefore(athleteRecommendation,campaignName);
+    athleteRecommendation.insertAdjacentHTML('beforebegin','<div class="recommendation-label">Recommended athlete</div>');
+    var createMatchWithTierRules=window.createMatch;
+    window.createMatch=function(){
+      createMatchWithTierRules();
+      if(currentBudget===500){
+        var sage=athletes.sage;
+        currentMatch='sage';currentCampaign='Built to Rise';currentPackage=['1 Instagram Story','Trackable QR offer','Community thank-you'];
+        document.getElementById('matchAthlete').textContent=sage.name;
+        document.getElementById('campaignName').textContent=currentCampaign;
+        document.getElementById('matchReason').textContent=currentSponsor+' can build trust with local families through Sage’s Utah roots and rising-athlete journey.';
+        document.getElementById('packageOne').textContent=currentPackage[0];
+        document.getElementById('packageTwo').textContent=currentPackage[1];
+        document.getElementById('packageThree').textContent=currentPackage[2];
+        document.getElementById('studioFit').textContent='Sage helps '+currentSponsor+' show up as a genuine community partner through a story that is relatable to young athletes and their families.';
+        document.getElementById('studioIdea').textContent='A confidence-themed youth-gymnastics Story pairs Sage’s Utah story with a simple QR offer for local families.';
+        document.getElementById('dashCampaign').textContent=currentCampaign;
+      }
+    };
     renderDirectory();renderFeatured();
   </script>
 </body>
