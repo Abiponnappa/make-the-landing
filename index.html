@@ -401,6 +401,14 @@
         document.getElementById('dashCampaign').textContent=currentCampaign;
       }
     };
+    var measurementPlan=document.querySelector('#studio .studio-card:nth-child(3) .tiny');
+    measurementPlan.id='studioMeasurement';
+    var createMatchWithMeasurementPlan=window.createMatch;
+    window.createMatch=function(){
+      createMatchWithMeasurementPlan();
+      var plan=currentIsCustom?'Confirm reach, content engagement, QR activity, and the sponsor’s agreed conversion goal before launch.':currentBudget===500?'Track Story views, QR scans, offer redemptions, and local-family engagement.':currentBudget===3000?'Track content reach, meet-day QR scans, offer redemptions, event engagement, and a post-campaign renewal recommendation.':'Track Reel views, Story engagement, QR scans, offer redemptions, and sponsor follow-up interest.';
+      document.getElementById('studioMeasurement').textContent=plan;
+    };
     renderDirectory();renderFeatured();
   </script>
 </body>
