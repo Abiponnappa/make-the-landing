@@ -45,7 +45,7 @@ All financial figures and campaign performance metrics in the prototype are illu
 
 ## Prototype
 
-View the functional prototype: [Make the Landing on Vercel](https://your-vercel-link.vercel.app)
+View the functional prototype: [Make the Landing on Vercel](https://make-the-landing-wfid.vercel.app/)
 ## Disclaimer
 
 This is a student prototype created for the Adobe Red Rocks AI Innovation Challenge. It does not represent an official University of Utah, Utah Red Rocks, athlete, or sponsor partnership.
