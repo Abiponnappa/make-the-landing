@@ -43,6 +43,9 @@ All financial figures and campaign performance metrics in the prototype are illu
 - Adobe Express creative concepts
 - AI-assisted campaign recommendations and sponsor-fit logic
 
+## Prototype
+
+View the functional prototype: [Make the Landing on Vercel](https://your-vercel-link.vercel.app)
 ## Disclaimer
 
 This is a student prototype created for the Adobe Red Rocks AI Innovation Challenge. It does not represent an official University of Utah, Utah Red Rocks, athlete, or sponsor partnership.
